@@ -9,7 +9,11 @@
                                     (list-ref match 2)
                                     (list-ref match 1)
                                     (list-ref match 4)
-                                    (list-ref match 3))
+                                    (if (not (string=? (list-ref match 3) ""))
+                                        (if (char=? (string-ref (list-ref match 3) 0) #\0) ;; remove filling 0's
+                                            (substring (list-ref match 3) 1)
+                                            (list-ref match 3))
+                                        ""))
                                    "\"" "\\\"")
                    out)
           (display "\" 0 " out)
