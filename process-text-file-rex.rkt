@@ -13,7 +13,7 @@
                                    "\"" "\\\"")
                    out)
           (display "\" 0 " out)
-          (display (list-ref match 8) out)
+          (display (if (string=? (list-ref match 8) "") "0" (list-ref match 8)) out)
           (display ")" out)
           (newline out)))
       (preprocess in))))
