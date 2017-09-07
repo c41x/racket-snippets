@@ -1,0 +1,52 @@
+#lang racket
+(require racket/udp)
+(require (planet williams/packed-binary/packed-binary))
+
+(define buffer (make-bytes 1024))
+
+(define (parse-frame)
+  (let ([frame (unpack "<Bfffffffff" buffer)])
+    (print (list-ref frame 1))
+    (print " q: ")
+    (print (list-ref frame 2))
+    (print ", ")
+    (print (list-ref frame 3))
+    (print ", ")
+    (print (list-ref frame 4))
+    (print ", ")
+    (print (list-ref frame 5))
+    ;; (print " q2: ")
+    ;; (print (list-ref frame 6))
+    ;; (print ", ")
+    ;; (print (list-ref frame 7))
+    ;; (print ", ")
+    ;; (print (list-ref frame 8))
+    ;; (print ", ")
+    ;; (print (list-ref frame 9))
+    (newline)))
+
+(define (parse-command)
+  (print "command returned: ")
+  (print (bytes-ref buffer 1))
+  (newline))
+
+(define (handle-data)
+  (cond [(= (bytes-ref buffer 0) 1) (parse-command)]
+        [(= (bytes-ref buffer 0) 2) (parse-frame)]))
+
+(define (udp-loop udp)
+  (udp-send udp (bytes 0))
+  (udp-receive! udp buffer)
+  (handle-data)
+  (udp-loop udp))
+
+(define (udp-command udp)
+  (udp-send udp (bytes 1 0 0 0 0))
+  (udp-receive! udp buffer)
+  (handle-data))
+
+(define udp (udp-open-socket))
+;;(udp-connect! udp "10.3.1.96" 9050)
+(udp-connect! udp "127.0.0.1" 9050)
+;;(udp-loop udp)
+(udp-command udp)
